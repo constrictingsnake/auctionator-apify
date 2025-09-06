@@ -1,0 +1,27 @@
+model TrackedItem {
+  id                        Int       @id @default(autoincrement()) // Unique ID
+  user                      User      @relation(fields: [userId], references: [id])
+  userId                    Int
+  platform                  String
+  itemUrl                   String
+  itemId                    String
+  title                     String
+  currentPrice              Float
+  currencyVal               String
+  lastChecked               DateTime  @default(now())
+  endTime                   DateTime?
+  status                    String
+  bids                      Int
+  description               String
+
+  // Seller Information
+  sellerName                String
+  sellerFeedback            String
+  sellerFeedbackPercentage  String
+
+  // Images
+  images                    String[]  // Array of image URLs
+
+  // Additional metadata
+  metadata                  Json?
+}
