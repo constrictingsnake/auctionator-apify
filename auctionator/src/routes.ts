@@ -5,23 +5,20 @@ export const router = createPlaywrightRouter();
 
 
 function ebayDurationToISO(durationStr: String) {
-    // Normalize and extract numbers
     const days = parseInt((durationStr.match(/(\d+)\s*d/) || [])[1]) || 0;
     const hours = parseInt((durationStr.match(/(\d+)\s*h/) || [])[1]) || 0;
     const minutes = parseInt((durationStr.match(/(\d+)\s*m/) || [])[1]) || 0;
 
-    // Calculate total milliseconds from now
     const totalMs = ((days * 24 * 60) + (hours * 60) + minutes) * 60 * 1000;
 
-    // Add to current time
     const endDate = new Date(Date.now() + totalMs);
 
-    return endDate.toISOString(); // Standard ISO 8601
+    return endDate.toISOString(); 
 }
 
 function GovDealsConvertToISO(dateStr: String) {
-    // Example input: "Sep 02, 2025 03:00 PM EDT"
-    // Step 1: Parse components
+
+
     const months:Record<string, string> = {
         Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
         Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
@@ -36,20 +33,20 @@ function GovDealsConvertToISO(dateStr: String) {
     const month = months[monthStr];
     let hours = parseInt(hour, 10);
 
-    // Convert to 24-hour format
+
     if (meridian === 'PM' && hours !== 12) hours += 12;
     if (meridian === 'AM' && hours === 12) hours = 0;
 
-    // Map common US time zones to offsets (you can expand this)
+    
     const tzOffsets: Record<string, string> = {
         EST: '-05:00', EDT: '-04:00',
         CST: '-06:00', CDT: '-05:00',
         MST: '-07:00', MDT: '-06:00',
         PST: '-08:00', PDT: '-07:00'
     };         
-    const offset = tzOffsets[tz] || 'Z'; // Default to UTC if unknown
+    const offset = tzOffsets[tz] || 'Z'; 
 
-    // Build ISO string
+
     return `${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${minute}:00${offset}`;
 }
 
@@ -91,7 +88,6 @@ router.addHandler('ebay', async ({ request, page, log}) => {
     const iframe = await page.locator('#desc_ifr');
     const iframeUrl = await iframe.getAttribute('src');
     let description = "";
-// Fetch the content directly
     if (iframeUrl) {
         const response = await page.request.get(iframeUrl);
         const htmlContent = await response.text();
@@ -116,21 +112,21 @@ router.addHandler('ebay', async ({ request, page, log}) => {
 
     
     await Dataset.pushData({
-        itemId: request.loadedUrl.split("/").pop() ?? "",  // or another way to extract ID
+        itemId: request.loadedUrl.split("/").pop() ?? "",  
         platform: platform,
         url: request.loadedUrl,
         title: itemTitle,
-        currentPrice: currentPrice,        // already formatted string/number
+        currentPrice: currentPrice,        
         currency: currency,
-        endTime: endTime,                  // ISO string
+        endTime: endTime,                 
         status: status,
         bids: bids,
         description: description,
         sellerName: sellerName,
         sellerFeedback: sellerFeedback,
         sellerFeedbackPercentage: sellerFeedbackPercentage,
-        images: [],                        // add later
-        metadata: {                        // optional
+        images: [],                        
+        metadata: {                       
             scrapedAt: new Date().toISOString()
         }
     });
@@ -159,21 +155,21 @@ router.addHandler('govdeals', async ({ request, page, log}) => {
     const sellerFeedbackPercentage = "N/A"
     const description = await page.locator('p.long-description .py-3').innerText();
     await Dataset.pushData({
-        itemId: request.loadedUrl.split("/").pop() ?? "",  // or another way to extract ID
+        itemId: request.loadedUrl.split("/").pop() ?? "",  
         platform: platform,
         url: request.loadedUrl,
         title: itemTitle,
-        currentPrice: currentPrice,        // already formatted string/number
+        currentPrice: currentPrice,        
         currency: currency,
-        endTime: endTime,                  // ISO string
+        endTime: endTime,                  
         status: status,
         bids: bids,
         description: description,
         sellerName: sellerName,
         sellerFeedback: sellerFeedback,
         sellerFeedbackPercentage: sellerFeedbackPercentage,
-        images: [],                        // add later
-        metadata: {                        // optional
+        images: [],                        
+        metadata: {                        
             scrapedAt: new Date().toISOString()
         }
     });
